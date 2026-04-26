@@ -1,7 +1,5 @@
 from flask import Flask, jsonify, request
-
 from llm_chatbot import generate_gemini_response
-
 
 def register_routes(app: Flask) -> None:
     @app.route("/")
@@ -19,8 +17,12 @@ def register_routes(app: Flask) -> None:
         if not user_message:
             return jsonify({"error": "Message cannot be empty."}), 400
 
+        user_id = data.get("user_id")
+        if user_id is not None:
+            user_id = str(user_id).strip() or None
+
         try:
-            response_text = generate_gemini_response(user_message)
+            response_text = generate_gemini_response(user_message, user_id=user_id)
             return jsonify({"success": True, "response": response_text}), 200
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 500
